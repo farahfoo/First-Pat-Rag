@@ -267,6 +267,15 @@ export default function App() {
   const [selectedAccountId, setSelectedAccountId] = useState('acc-01');
   const [activityAccountFilter, setActivityAccountFilter] = useState<string>('All');
   const [eftPayInOpen, setEftPayInOpen] = useState(false);
+  // Create Payment State
+  const [isCreatePaymentModalOpen, setIsCreatePaymentModalOpen] = useState(false);
+  const [newPayee, setNewPayee] = useState('');
+  const [newPayoutAmount, setNewPayoutAmount] = useState('');
+  const [newCurrency, setNewCurrency] = useState('GBP');
+  const [newPayoutType, setNewPayoutType] = useState('Supplier');
+  const [newPayoutUrgency, setNewPayoutUrgency] = useState('Medium');
+  const [newIban, setNewIban] = useState('');
+  const [newMemo, setNewMemo] = useState('');
   const [eftAmount, setEftAmount] = useState('25000');
   const [eftOriginBank, setEftOriginBank] = useState('First National Bank (FNB)');
   const [sandboxApiKey, setSandboxApiKey] = useState('st_sk_live_9921_farah_e53df40');
@@ -471,6 +480,57 @@ export default function App() {
     const nextState = !isAllPendingSelected;
     setTransactions(prev => prev.map(t => t.status === 'Pending' ? { ...t, selected: nextState } : t));
     addLog(nextState ? 'Checked all Stitch pending items.' : 'Deselected all pending items.');
+  };
+
+  const handleInitiateNewPayment = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPayee || !newPayoutAmount) {
+      setToastNotification("Please fill in payee name and amount!");
+      setTimeout(() => setToastNotification(null), 3000);
+      return;
+    }
+
+    const amtNum = parseFloat(newPayoutAmount);
+    if (isNaN(amtNum) || amtNum <= 0) {
+      setToastNotification("Please enter a valid positive number for amount!");
+      setTimeout(() => setToastNotification(null), 3000);
+      return;
+    }
+
+    const newTxId = `tx-${Math.floor(10000 + Math.random() * 90000)}`;
+    const newTx: Transaction = {
+      id: newTxId,
+      beneficiary: newPayee,
+      amount: amtNum,
+      currency: newCurrency,
+      type: newPayoutType,
+      urgency: newPayoutUrgency,
+      requester: "farahfoo@gmail.com (CEO)",
+      date: "Just now",
+      status: "Pending",
+      selected: false,
+      riskScore: Math.floor(Math.random() * 3) + 1,
+      auditRating: "Routine / Verified",
+      summary: newMemo || `Manually created Swift dispatch wire to ${newPayee}.`,
+      flaggedAnomalies: ["None. Created by CEO mobile console."],
+      recommendation: "Approved by creator. Direct release permitted."
+    };
+
+    setTransactions(prev => [newTx, ...prev]);
+    setIsCreatePaymentModalOpen(false);
+    
+    // Reset form
+    setNewPayee('');
+    setNewPayoutAmount('');
+    setNewCurrency('GBP');
+    setNewPayoutType('Supplier');
+    setNewPayoutUrgency('Medium');
+    setNewIban('');
+    setNewMemo('');
+
+    addLog(`PAYMENTS ENGINE: Initiated new payment wire ${newTxId} of ${getCurrencySymbol(newCurrency)}${amtNum} to ${newPayee}. Queued in approvals Workspace.`);
+    setToastNotification(`Success: Payout ${newTxId} queued for approval!`);
+    setTimeout(() => setToastNotification(null), 3000);
   };
 
   const toggleSelectIndividual = (id: string, e?: React.MouseEvent) => {
@@ -1721,10 +1781,18 @@ export default function App() {
                         
                         {/* Sticky Header & Filter Bar for Payments */}
                         <div className="sticky top-0 bg-slate-50/95 backdrop-blur-md pt-2 pb-3 mb-2 z-20 flex flex-col gap-3 border-b border-slate-100">
-                          <div>
-                            <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider font-bold">Financial Archive</p>
-                            <h2 className="text-base font-black text-slate-900 font-bold">Payments Ledger</h2>
-                            <p className="text-[9px] text-indigo-500 font-bold mt-0.5">💡 Touch & hold any payment to open its quick menu!</p>
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider font-bold">Financial Archive</p>
+                              <h2 className="text-base font-black text-slate-900 font-bold">Payments Ledger</h2>
+                              <p className="text-[9px] text-indigo-500 font-bold mt-0.5">💡 Touch & hold any payment to open its quick menu!</p>
+                            </div>
+                            <button
+                              onClick={() => setIsCreatePaymentModalOpen(true)}
+                              className="px-2.5 py-1.5 bg-[#0c244c] hover:bg-slate-900 text-white text-[9.5px] font-black rounded-lg uppercase tracking-wider shadow-xs flex items-center gap-1 cursor-pointer font-bold shrink-0"
+                            >
+                              <Plus className="w-3.5 h-3.5 text-emerald-400" /> New Payout
+                            </button>
                           </div>
 
                           <div className="relative">
@@ -2354,6 +2422,143 @@ export default function App() {
             )}
 
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ================================================================================= */}
+      {/* ================================= GLOBAL MODALS ================================ */}
+      {/* ================================================================================= */}
+
+      {/* MODAL 0: INITIATE NEW PAYOUT FORM MODAL */}
+      <AnimatePresence>
+        {isCreatePaymentModalOpen && (
+          <>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsCreatePaymentModalOpen(false)} className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.3 }}
+              className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#0c142c] border border-slate-800 rounded-2xl p-6 shadow-2xl max-w-md w-[92%] z-50 text-left text-slate-100 font-semibold"
+            >
+              <div className="flex justify-between items-start mb-4 border-b border-slate-800 pb-2">
+                <div className="flex items-center gap-2 text-emerald-400">
+                  <CreditCard className="w-5 h-5 text-emerald-400" />
+                  <h3 className="text-sm font-black uppercase tracking-wider">Initiate New Payout</h3>
+                </div>
+                <button onClick={() => setIsCreatePaymentModalOpen(false)} className="p-1 hover:bg-slate-800 rounded-full transition-colors text-slate-400"><X className="w-4 h-4" /></button>
+              </div>
+
+              <form onSubmit={handleInitiateNewPayment} className="flex flex-col gap-3 text-xs">
+                <div>
+                  <label className="block text-[10px] text-slate-400 uppercase tracking-wider mb-1 font-bold">Beneficiary / Payee Name</label>
+                  <input 
+                    type="text" 
+                    required 
+                    value={newPayee} 
+                    onChange={e => setNewPayee(e.target.value)} 
+                    placeholder="e.g. DHL Express Da Nang" 
+                    className="w-full bg-slate-950 border border-slate-800 text-white rounded-lg px-3 py-2 outline-none focus:border-emerald-500 font-semibold" 
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-[10px] text-slate-400 uppercase tracking-wider mb-1 font-bold">Amount</label>
+                    <input 
+                      type="number" 
+                      required 
+                      step="any" 
+                      value={newPayoutAmount} 
+                      onChange={e => setNewPayoutAmount(e.target.value)} 
+                      placeholder="0.00" 
+                      className="w-full bg-slate-950 border border-slate-800 text-white rounded-lg px-3 py-2 outline-none focus:border-emerald-500 font-mono font-semibold" 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] text-slate-400 uppercase tracking-wider mb-1 font-bold">Currency</label>
+                    <select 
+                      value={newCurrency} 
+                      onChange={e => setNewCurrency(e.target.value)} 
+                      className="w-full bg-slate-950 border border-slate-800 text-white rounded-lg px-3 py-2 outline-none focus:border-emerald-500 font-bold"
+                    >
+                      <option value="GBP">GBP (£)</option>
+                      <option value="USD">USD ($)</option>
+                      <option value="VND">VND (₫)</option>
+                      <option value="EUR">EUR (€)</option>
+                      <option value="ZAR">ZAR (R)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-[10px] text-slate-400 uppercase tracking-wider mb-1 font-bold">Payout Type</label>
+                    <select 
+                      value={newPayoutType} 
+                      onChange={e => setNewPayoutType(e.target.value)} 
+                      className="w-full bg-slate-950 border border-slate-800 text-white rounded-lg px-3 py-2 outline-none focus:border-emerald-500 font-semibold"
+                    >
+                      <option value="Supplier">Supplier Wire</option>
+                      <option value="Payroll">Payroll</option>
+                      <option value="Transfer">Internal Transfer</option>
+                      <option value="Misc">Miscellaneous</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] text-slate-400 uppercase tracking-wider mb-1 font-bold">Urgency</label>
+                    <select 
+                      value={newPayoutUrgency} 
+                      onChange={e => setNewPayoutUrgency(e.target.value)} 
+                      className="w-full bg-slate-950 border border-slate-800 text-white rounded-lg px-3 py-2 outline-none focus:border-emerald-500 font-semibold"
+                    >
+                      <option value="Low">Low</option>
+                      <option value="Medium">Medium</option>
+                      <option value="High">High</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] text-slate-400 uppercase tracking-wider mb-1 font-bold">Destination Bank IBAN / Route Code</label>
+                  <input 
+                    type="text" 
+                    value={newIban} 
+                    onChange={e => setNewIban(e.target.value)} 
+                    placeholder="e.g. GB21LOYD30928172648392" 
+                    className="w-full bg-slate-950 border border-slate-800 text-white rounded-lg px-3 py-2 outline-none focus:border-emerald-500 font-mono font-semibold" 
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] text-slate-400 uppercase tracking-wider mb-1 font-bold">Payment Memo / Purpose Notes</label>
+                  <textarea 
+                    value={newMemo} 
+                    onChange={e => setNewMemo(e.target.value)} 
+                    placeholder="e.g. Consignment terminal fee clearance" 
+                    rows={2} 
+                    className="w-full bg-slate-950 border border-slate-800 text-white rounded-lg px-3 py-1.5 outline-none focus:border-emerald-500 font-semibold resize-none scrollbar-none" 
+                  />
+                </div>
+
+                <div className="flex gap-2 pt-2">
+                  <button 
+                    type="button" 
+                    onClick={() => setIsCreatePaymentModalOpen(false)} 
+                    className="flex-1 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-300 font-extrabold rounded-lg text-center cursor-pointer font-bold transition-all border border-slate-800"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit" 
+                    className="flex-1 py-2.5 bg-[#059669] hover:bg-emerald-600 text-white font-extrabold rounded-lg text-center cursor-pointer font-bold transition-all shadow-md shadow-emerald-500/10"
+                  >
+                    Submit & Queue
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 
