@@ -1216,9 +1216,14 @@ export default function App() {
                                       <p className="text-[8px] text-slate-400 font-bold uppercase mt-0.5">{tx.id} · {tx.type}</p>
                                     </div>
                                   </div>
-                                  <p className={`text-[11px] font-black font-mono text-slate-900 ${blurBalances ? 'filter blur-sm select-none' : ''}`}>
-                                    {getCurrencySymbol(selectedCurrency)}{convertBalance(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                  </p>
+                                  <div className="text-right">
+                                    <p className={`text-[11px] font-black font-mono text-slate-900 leading-tight ${blurBalances ? 'filter blur-sm select-none' : ''}`}>
+                                      {getCurrencySymbol(selectedCurrency)}{convertBalance(tx.amount, tx.currency).toLocaleString(undefined, { minimumFractionDigits: selectedCurrency === 'VND' ? 0 : 2 })}
+                                    </p>
+                                    <p className={`text-[8px] font-bold font-mono text-slate-400 mt-0.5 uppercase leading-none ${blurBalances ? 'filter blur-sm select-none' : ''}`}>
+                                      {getCurrencySymbol(tx.currency)}{tx.amount.toLocaleString(undefined, { minimumFractionDigits: tx.currency === 'VND' ? 0 : 2 })} {tx.currency}
+                                    </p>
+                                  </div>
                                 </div>
                               ))
                             )}
