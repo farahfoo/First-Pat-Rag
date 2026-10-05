@@ -2121,27 +2121,27 @@ export default function App() {
                   {/* PERSISTENT BOTTOM NAVIGATION TAB BAR (Dashboard, Payments, Workspace, Chat, Profile) */}
                   <div className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 z-45">
                     <div className="grid grid-cols-5 h-14 pb-safe select-none">
-                      <button onClick={() => { setMobileTab('dashboard'); setCurrentStoryScreen(1); }} className={`flex flex-col items-center justify-center text-slate-400 hover:text-slate-900 transition-colors ${mobileTab === 'dashboard' ? 'text-emerald-600 font-extrabold' : ''}`}>
+                      <button onClick={() => { setMobileTab('dashboard'); setCurrentStoryScreen(1); }} className={`flex flex-col items-center justify-center text-slate-400 hover:text-slate-900 transition-colors ${[1, 2, 3, 4].includes(currentStoryScreen) ? 'text-emerald-600 font-extrabold' : ''}`}>
                         <LayoutDashboard className="w-4 h-4" /><span className="text-[8px] font-extrabold mt-1 tracking-tighter uppercase">Dashboard</span>
                       </button>
-                      <button onClick={() => { setMobileTab('payments'); setCurrentStoryScreen(10); }} className={`flex flex-col items-center justify-center text-slate-400 hover:text-slate-900 transition-colors ${mobileTab === 'payments' ? 'text-emerald-600 font-extrabold' : ''}`}>
+                      <button onClick={() => { setMobileTab('payments'); setCurrentStoryScreen(10); }} className={`flex flex-col items-center justify-center text-slate-400 hover:text-slate-900 transition-colors ${[5, 6, 7, 10].includes(currentStoryScreen) ? 'text-emerald-600 font-extrabold' : ''}`}>
                         <DollarSign className="w-4 h-4" /><span className="text-[8px] font-extrabold mt-1 tracking-tighter uppercase">Payments</span>
                       </button>
-                      <button onClick={() => { setMobileTab('authorisations'); setCurrentStoryScreen(8); }} className={`flex flex-col items-center justify-center text-slate-400 hover:text-[#0c244c] transition-colors relative ${mobileTab === 'authorisations' ? 'text-emerald-600 font-extrabold' : ''}`}>
+                      <button onClick={() => { setMobileTab('authorisations'); setCurrentStoryScreen(8); }} className={`flex flex-col items-center justify-center text-slate-400 hover:text-[#0c244c] transition-colors relative ${currentStoryScreen === 8 ? 'text-emerald-600 font-extrabold' : ''}`}>
                         <div className="relative">
                           <ShieldAlert className="w-4 h-4" />
                           {pendingItems.length > 0 && <span className="absolute -top-1.5 -right-2 bg-rose-500 text-white rounded-full text-[7px] font-black w-3.5 h-3.5 flex items-center justify-center font-mono">{pendingItems.length}</span>}
                         </div>
                         <span className="text-[8px] font-extrabold mt-1 tracking-tighter uppercase">Workspace</span>
                       </button>
-                      <button onClick={() => { setMobileTab('chat'); setCurrentStoryScreen(9); }} className={`flex flex-col items-center justify-center text-slate-400 hover:text-slate-900 transition-colors relative ${mobileTab === 'chat' ? 'text-emerald-600 font-extrabold' : ''}`}>
+                      <button onClick={() => { setMobileTab('chat'); setCurrentStoryScreen(9); }} className={`flex flex-col items-center justify-center text-slate-400 hover:text-slate-900 transition-colors relative ${currentStoryScreen === 9 ? 'text-emerald-600 font-extrabold' : ''}`}>
                         <div className="relative">
                           <MessageSquare className="w-4 h-4" />
                           {walkieTalkieActive && walkieTalkieStep < 6 && <span className="absolute -top-1.5 -right-1.5 bg-indigo-500 w-2 h-2 rounded-full animate-ping" />}
                         </div>
                         <span className="text-[8px] font-extrabold mt-1 tracking-tighter uppercase">Chat</span>
                       </button>
-                      <button onClick={() => { setMobileTab('profile'); setCurrentStoryScreen(11); }} className={`flex flex-col items-center justify-center text-slate-400 hover:text-slate-900 transition-colors ${mobileTab === 'profile' ? 'text-emerald-600 font-extrabold' : ''}`}>
+                      <button onClick={() => { setMobileTab('profile'); setCurrentStoryScreen(11); }} className={`flex flex-col items-center justify-center text-slate-400 hover:text-slate-900 transition-colors ${currentStoryScreen === 11 ? 'text-emerald-600 font-extrabold' : ''}`}>
                         <User className="w-4 h-4" /><span className="text-[8px] font-extrabold mt-1 tracking-tighter uppercase">Profile</span>
                       </button>
                     </div>
