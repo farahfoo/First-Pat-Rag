@@ -1133,8 +1133,8 @@ export default function App() {
                           
                           <div 
                             id="account-carousel-container"
-                            className="flex gap-2.5 overflow-x-auto pb-1.5 mt-1 scroll-smooth snap-x snap-mandatory flex-nowrap overscroll-x-contain touch-pan-x"
-                            style={{ WebkitOverflowScrolling: 'touch' }}
+                            className="flex gap-2.5 overflow-x-auto pb-1.5 mt-1 scroll-smooth flex-nowrap overscroll-x-contain touch-pan-x"
+                            style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory' }}
                           >
                             {bankAccounts.map(acc => (
                               <button
@@ -1143,7 +1143,8 @@ export default function App() {
                                   setSelectedAccountId(acc.id);
                                   addLog(`BANK SWITCH: Switched primary dashboard context to ${acc.bank}.`);
                                 }}
-                                className={`snap-center shrink-0 w-[145px] text-left p-3 rounded-xl border text-xs transition-all cursor-pointer flex flex-col justify-between h-[85px] ${acc.id === selectedAccountId ? 'bg-[#0c244c] text-white border-[#0c244c] shadow-md ring-2 ring-emerald-500/10' : 'bg-slate-50 text-slate-800 border-slate-200/80 hover:bg-slate-100'}`}
+                                className={`shrink-0 w-[145px] text-left p-3 rounded-xl border text-xs transition-all cursor-pointer flex flex-col justify-between h-[85px] ${acc.id === selectedAccountId ? 'bg-[#0c244c] text-white border-[#0c244c] shadow-md ring-2 ring-emerald-500/10' : 'bg-slate-50 text-slate-800 border-slate-200/80 hover:bg-slate-100'}`}
+                                style={{ scrollSnapAlign: 'start' }}
                               >
                                 <div>
                                   <p className={`text-[7.5px] font-extrabold uppercase truncate ${acc.id === selectedAccountId ? 'text-teal-300' : 'text-slate-400'}`}>{acc.bank}</p>
