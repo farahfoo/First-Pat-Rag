@@ -218,8 +218,19 @@ export default function App() {
   
   // Navigation & Workspace Tabs
   const [displayMode, setDisplayMode] = useState<'split-simulator' | 'desktop-console'>('split-simulator');
-  const [mobileTab, setMobileTab] = useState<'dashboard' | 'payments' | 'authorisations' | 'chat' | 'profile'>('authorisations');
+  const [mobileTab, setMobileTab] = useState<'dashboard' | 'payments' | 'authorisations' | 'chat' | 'profile'>('dashboard');
   const [desktopTab, setDesktopTab] = useState<'dashboard' | 'payments' | 'authorisations' | 'chat' | 'profile'>('dashboard');
+
+  // 11-Screen Interactive Story Player State
+  const [currentStoryScreen, setCurrentStoryScreen] = useState<number>(1);
+  const [crystalBallFilter, setCrystalBallFilter] = useState<'All' | 'Bills' | 'Income'>('All');
+  const [isOverdraftRescueApplied, setIsOverdraftRescueApplied] = useState(false);
+  const [isCameraFocused, setIsCameraFocused] = useState(false);
+  const [isCameraCaptured, setIsCameraCaptured] = useState(false);
+  const [isContractSummarized, setIsContractSummarized] = useState(false);
+  const [whatsappUnread, setWhatsappUnread] = useState(true);
+  const [whatsappActive, setWhatsappActive] = useState(false);
+  const [isMapTrackerOpen, setIsMapTrackerOpen] = useState(false);
 
   // Conversational Support State
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
@@ -926,40 +937,65 @@ export default function App() {
             {/* LEFT COL: Stitch Creator Controls */}
             <div className="col-span-1 lg:col-span-3 flex flex-col gap-5">
               
-              {/* Emergency Walkie-Talkie Demo Controller card */}
-              <div className="bg-gradient-to-br from-indigo-950/30 to-slate-900 border border-indigo-500/20 rounded-xl p-5 shadow-xl relative overflow-hidden text-left">
-                <div className="absolute -right-3 -top-3 w-16 h-16 bg-indigo-500/10 rounded-full flex items-center justify-center">
-                  <Radio className="w-6 h-6 text-indigo-400 animate-pulse" />
+              {/* Interactive 11-Screen Prototype Story Player */}
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-xl text-left flex flex-col gap-3">
+                <div>
+                  <div className="flex items-center gap-1.5 text-emerald-400">
+                    <Sparkles className="w-4 h-4 text-emerald-400" />
+                    <h3 className="text-xs font-bold uppercase tracking-wider font-bold">Stitch Story Player</h3>
+                  </div>
+                  <p className="text-[10px] text-slate-400 mt-1 leading-relaxed font-semibold">
+                    Tap any story screen to instantly route the mobile simulation to that planned curriculum checkpoint.
+                  </p>
                 </div>
-                
-                <p className="text-[10px] font-extrabold text-indigo-400 uppercase tracking-widest mb-1.5 flex items-center gap-1 font-bold">
-                  <Sparkles className="w-3 h-3" /> VIP Airport Hotline
-                </p>
-                <h3 className="text-sm font-black text-slate-100">Walkie-Talkie Scenario</h3>
-                <p className="text-[11px] text-slate-400 mt-2 leading-relaxed">
-                  Taps <strong>"Bank Concierge"</strong>. Holds a giant Microphone. Tells the bank: <em>"supplier details changed overnight"</em> to instantly freeze fraud.
-                </p>
 
-                <div className="mt-4 flex flex-col gap-2">
-                  <button
-                    onClick={() => {
-                      setMobileTab('chat');
-                      setDesktopTab('chat');
-                      startWalkieTalkieStory();
-                    }}
-                    className="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs rounded-lg shadow-lg flex items-center justify-center gap-1.5 cursor-pointer font-bold"
-                  >
-                    <Mic className="w-3.5 h-3.5" /> Start Walkie-Talkie Demo
-                  </button>
-                  
-                  {walkieTalkieActive && (
+                <div className="flex flex-col gap-1.5 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin">
+                  {[
+                    { id: 1, label: '1. Money Thermometer', desc: 'Recalculate & lock wealth (Home)', action: () => { setCurrentStoryScreen(1); setMobileTab('dashboard'); } },
+                    { id: 2, label: '2. The Crystal Ball', desc: 'Predict future with timeline sliders', action: () => { setCurrentStoryScreen(2); } },
+                    { id: 3, label: '3. The X-Ray View', desc: 'Audit factory coffee invoice bags', action: () => { setCurrentStoryScreen(3); } },
+                    { id: 4, label: '4. The Smart Rescue', desc: 'Resolve Friday overdraft lifelines', action: () => { setCurrentStoryScreen(4); } },
+                    { id: 5, label: '5. The Chat Shortcut', desc: 'Magic £200 floating AI pay chip', action: () => { setCurrentStoryScreen(5); setWhatsappActive(false); setWhatsappUnread(true); } },
+                    { id: 6, label: '6. The Magic Camera', desc: 'Zero-typo OCR receipt shutter focus', action: () => { setCurrentStoryScreen(6); setIsCameraCaptured(false); setIsCameraFocused(false); } },
+                    { id: 7, label: '7. The AI Reader', desc: 'Summarize 10-pg legal PDF contract', action: () => { setCurrentStoryScreen(7); setIsContractSummarized(false); } },
+                    { id: 8, label: '8. Boss\'s Workspace', desc: 'Triage due diligence & bulk swipe', action: () => { setCurrentStoryScreen(8); setMobileTab('authorisations'); } },
+                    { id: 9, label: '9. VIP Hotline Chat', desc: 'Walkie-talkie voice freeze audit', action: () => { setCurrentStoryScreen(9); setMobileTab('chat'); startWalkieTalkieStory(); } },
+                    { id: 10, label: '10. Delivery Tracker', desc: 'Visual SVG UK-to-Vietnam map route', action: () => { setCurrentStoryScreen(10); setIsMapTrackerOpen(true); } },
+                    { id: 11, label: '11. Vacation Mode', desc: 'Sunset setting delegation threshold', action: () => { setCurrentStoryScreen(11); setMobileTab('profile'); setVacationMode(true); } },
+                  ].map((sc) => (
                     <button
-                      onClick={exitWalkieTalkie}
-                      className="w-full py-1.5 bg-slate-950 border border-slate-800 text-slate-400 hover:text-slate-200 text-[10px] font-bold rounded-lg cursor-pointer"
+                      key={sc.id}
+                      onClick={() => {
+                        sc.action();
+                        addLog(`STORY DECK: Directed mobile viewport to Screen ${sc.id} — ${sc.label}.`);
+                      }}
+                      className={`w-full text-left p-2 rounded-lg border text-xs transition-all cursor-pointer ${currentStoryScreen === sc.id ? 'bg-[#0c244c] border-emerald-500 text-white font-bold ring-1 ring-emerald-500/20' : 'bg-slate-950/40 border-slate-800 text-slate-300 hover:bg-slate-950/80 hover:text-white'}`}
                     >
-                      Exit Demo Mode
+                      <div className="flex justify-between items-center">
+                        <span className="font-extrabold text-[10.5px] truncate">{sc.label}</span>
+                        {currentStoryScreen === sc.id && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />}
+                      </div>
+                      <p className="text-[8.5px] text-slate-400 mt-0.5 font-semibold leading-tight">{sc.desc}</p>
                     </button>
-                  )}
+                  ))}
+                </div>
+
+                {/* Active Screen Story Card Info text */}
+                <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 mt-1">
+                  <p className="text-[8px] font-black uppercase text-teal-400 tracking-wider">Active Story State</p>
+                  <p className="text-[10px] text-slate-300 font-semibold leading-relaxed mt-1">
+                    {currentStoryScreen === 1 && "Screen 1 (Home): Wealth health. Tapping the currency dropdown converts ZAR, VND & GBP balances dynamically. Toggle lock blurs values."}
+                    {currentStoryScreen === 2 && "Screen 2 (Timeline): Forecaster. Drag range slider to Next Friday; watch balance deplete. Tap red coffee bill to audit."}
+                    {currentStoryScreen === 3 && "Screen 3 (X-Ray): Cargo receipt details. Tap 'Change Date' to see friday restrictions, or tap flashing overdraft warning banner."}
+                    {currentStoryScreen === 4 && "Screen 4 (Lifelines): Rescue. Smash savings, inject working capital, or transfer foreign funds from Cape Town pools to avoid penalties."}
+                    {currentStoryScreen === 5 && "Screen 5 (WhatsApp): Simulated chat from courier. Tap the glowing '✨ AI Pay £200' floating button."}
+                    {currentStoryScreen === 6 && "Screen 6 (Camera): Camera lens. Click capture to extract parameters with zero typos."}
+                    {currentStoryScreen === 7 && "Screen 7 (AI Reader): Legal document. Scroll dense text and tap '✨ AI Summarize' to get executive cliff notes."}
+                    {currentStoryScreen === 8 && "Screen 8 (Workspace): CEO triage hub. Filter due today, read routing mismatch warnings, reject suspect wiring, and select-all swipe to approve safe list."}
+                    {currentStoryScreen === 9 && "Screen 9 (Hotline): Walkie-talkie. Hold record mic to transmit airport audio. Hit Freeze Supplier."}
+                    {currentStoryScreen === 10 && "Screen 10 (Map): Visual tracking. Toggle Map View to animate payment routing from London to Vietnam."}
+                    {currentStoryScreen === 11 && "Screen 11 (Sunset): Handing keys. Select finance manager limits. Home fades to a relaxing sunset."}
+                  </p>
                 </div>
               </div>
 
@@ -1020,8 +1056,8 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Smartphone Display boundaries */}
-                <div className="flex-1 bg-slate-50 text-slate-900 rounded-[32px] overflow-hidden flex flex-col relative shadow-inner">
+                 {/* Smartphone Display boundaries */}
+                <div className={`flex-1 rounded-[32px] overflow-hidden flex flex-col relative shadow-inner transition-all duration-1000 ${currentStoryScreen === 11 && vacationMode ? 'bg-gradient-to-b from-amber-600/35 via-rose-500/25 to-[#0b1528] text-white' : 'bg-slate-50 text-slate-900'}`}>
                   
                   {/* Sticky Notification Toast inside phone */}
                   <AnimatePresence>
@@ -1048,8 +1084,418 @@ export default function App() {
                     style={{ WebkitOverflowScrolling: 'touch' }}
                   >
                     
+                    {/* ----------------- SCREEN 2: THE CRYSTAL BALL ----------------- */}
+                    {currentStoryScreen === 2 && (
+                      <div className="flex flex-col gap-4 animate-fadeIn text-left font-semibold">
+                        <div>
+                          <span className="text-[8px] font-black uppercase bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-full font-mono font-bold">Screen 2: Forecasting</span>
+                          <h2 className="text-base font-black text-slate-900 mt-1 font-bold">The Crystal Ball</h2>
+                          <p className="text-[10px] text-slate-500 mt-0.5 font-bold">Predict and visualize your upcoming week's liquidity pool.</p>
+                        </div>
+
+                        {/* Total Forecast Pool */}
+                        <div className="bg-[#0c244c] text-white rounded-2xl p-5 shadow-lg relative overflow-hidden flex flex-col justify-between min-h-[110px]">
+                          <div>
+                            <p className="text-[9px] font-black uppercase tracking-widest text-indigo-300">Projected Cash Balance</p>
+                            <h1 className="text-2xl font-black font-mono tracking-tight mt-1.5 tabular-nums">
+                              {getCurrencySymbol(selectedCurrency)}{(totalBalanceDisplay - (projectionDays * 12500)).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                            </h1>
+                            <p className="text-[8px] text-indigo-300 font-mono mt-1 font-bold">Forecast limit: {projectionDays} days out (Next Friday)</p>
+                          </div>
+                        </div>
+
+                        {/* Filters Row */}
+                        <div className="flex gap-1.5 p-0.5 bg-slate-100 rounded-lg">
+                          {['All Flows', 'Bills Only', 'Income Only'].map((f) => (
+                            <button
+                              key={f}
+                              onClick={() => {
+                                setCrystalBallFilter(f === 'All Flows' ? 'All' : (f === 'Bills Only' ? 'Bills' : 'Income'));
+                                addLog(`FORECAST FILTER: Excluded standard listings to show ${f}.`);
+                              }}
+                              className={`flex-1 py-1.5 text-[8.5px] font-black rounded-md transition-all cursor-pointer text-center font-bold ${
+                                (f === 'All Flows' && crystalBallFilter === 'All') ||
+                                (f === 'Bills Only' && crystalBallFilter === 'Bills') ||
+                                (f === 'Income Only' && crystalBallFilter === 'Income')
+                                  ? 'bg-[#0c244c] text-white shadow-xs'
+                                  : 'text-slate-500 hover:text-slate-900'
+                              }`}
+                            >
+                              {f}
+                            </button>
+                          ))}
+                        </div>
+
+                        {/* Interactive Timeline range slider */}
+                        <div className="bg-white border border-slate-200 rounded-xl p-4 text-left shadow-xs">
+                          <div className="flex justify-between items-center text-[10px] font-extrabold uppercase text-slate-500 tracking-wider mb-2 font-bold">
+                            <span>Adjust Cash Timeline</span>
+                            <span className="text-[#0c244c] font-mono">+{projectionDays} Days</span>
+                          </div>
+                          <input
+                            type="range"
+                            min="0"
+                            max="30"
+                            step="1"
+                            value={projectionDays}
+                            onChange={(e) => {
+                              setProjectionDays(parseInt(e.target.value));
+                              addLog(`FORECAST SLIDER: Projected balance out to day +${e.target.value}.`);
+                            }}
+                            className="w-full accent-[#0c244c] cursor-pointer"
+                          />
+                          <div className="flex justify-between items-center text-[8px] text-slate-400 font-black mt-1 font-bold">
+                            <span>TODAY</span>
+                            <span className={projectionDays >= 7 ? "text-rose-500 font-bold font-black" : ""}>NEXT FRIDAY (DAY 7)</span>
+                            <span>30 DAYS OUT</span>
+                          </div>
+                        </div>
+
+                        {/* Dynamic Flows ledger */}
+                        <div className="bg-white border border-slate-200 rounded-2xl p-4 text-left shadow-xs flex flex-col gap-2.5">
+                          <p className="text-[9px] font-black uppercase text-[#0c244c] tracking-wider border-b pb-1.5 border-slate-100">Scheduled Obligations</p>
+                          
+                          {/* Item 1: Payroll */}
+                          {crystalBallFilter !== 'Income' && (
+                            <div className="flex justify-between items-center p-2 hover:bg-slate-50 rounded-xl border border-transparent">
+                              <div className="flex items-center gap-2">
+                                <div className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center shrink-0 border"><Users className="w-3.5 h-3.5 text-slate-600" /></div>
+                                <div>
+                                  <p className="text-[10px] font-extrabold text-[#0c244c] font-bold">Automated Payroll Settlement</p>
+                                  <p className="text-[8px] text-slate-400 font-bold font-mono">TODAY · PENDING</p>
+                                </div>
+                              </div>
+                              <p className="text-[10px] font-black font-mono text-slate-900">-£42,150.00</p>
+                            </div>
+                          )}
+
+                          {/* Item 2: Massive red Coffee Bean Cargo Bill */}
+                          {crystalBallFilter !== 'Income' && projectionDays >= 7 && (
+                            <div 
+                              onClick={() => {
+                                setCurrentStoryScreen(3);
+                                addLog(`STORY DECK: Flowed to Screen 3 (X-Ray View) to audit Vietnam factory cargo.`);
+                              }}
+                              className="flex justify-between items-center p-3.5 bg-rose-50 hover:bg-rose-100 rounded-xl border border-rose-200 cursor-pointer animate-pulse"
+                            >
+                              <div className="flex items-center gap-2.5">
+                                <div className="w-7 h-7 rounded-full bg-rose-500 text-white flex items-center justify-center shrink-0 border border-rose-400"><Briefcase className="w-3.5 h-3.5" /></div>
+                                <div>
+                                  <p className="text-[10.5px] font-black text-rose-950 font-bold">Vietnam Factory Coffee Cargo</p>
+                                  <p className="text-[7.5px] text-rose-600 font-black font-mono">👉 TAP TO AUDIT RECEIPT (SCREEN 3)</p>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-[10.5px] font-black font-mono text-rose-700">-£5,000.00</p>
+                                <span className="text-[7px] font-extrabold text-rose-500 uppercase tracking-widest block font-mono font-bold">DUE FRIDAY</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ----------------- SCREEN 3: THE X-RAY VIEW ----------------- */}
+                    {currentStoryScreen === 3 && (
+                      <div className="flex flex-col gap-4 animate-fadeIn text-left font-semibold">
+                        <div>
+                          <span className="text-[8px] font-black uppercase bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-mono font-bold">Screen 3: X-Ray View</span>
+                          <h2 className="text-base font-black text-slate-900 mt-1 font-bold">Vietnam Cargo Audit</h2>
+                          <p className="text-[10px] text-slate-500 mt-0.5 font-bold">Drill deep into the digital invoice bags scheduled for Friday release.</p>
+                        </div>
+
+                        {/* Attached Image Bags of Coffee Beans */}
+                        <div className="bg-slate-100 border border-slate-200 rounded-2xl overflow-hidden shadow-xs relative">
+                          <div className="h-32 bg-slate-950 flex items-center justify-center relative">
+                            <div className="text-center text-slate-400 p-4">
+                              <Briefcase className="w-8 h-8 text-emerald-400 mx-auto mb-2 animate-bounce" />
+                              <span className="text-[9px] font-mono block text-slate-300 font-bold">VIETNAM FACTORY CARGO INVOICE IMG</span>
+                              <span className="text-[7.5px] text-slate-500 font-black block mt-0.5 font-bold">Verified load: 24,000kg premium coffee bean sacs</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Warning Overdraft Banner */}
+                        <div 
+                          onClick={() => {
+                            setCurrentStoryScreen(4);
+                            addLog("STORY DECK: Overdraft detected. Redirecting to Screen 4 (The Smart Rescue).");
+                          }}
+                          className="bg-rose-600 text-white rounded-xl p-3 shadow-md border border-rose-700 cursor-pointer animate-pulse"
+                        >
+                          <p className="text-[8px] font-black uppercase tracking-widest text-rose-200">🚨 compliance threat triggered</p>
+                          <p className="text-[10px] font-black mt-1 leading-normal text-rose-100 font-bold">
+                            Warning: Releasing this £5,000 bill on Friday will trigger an OVERDRAFT. Tapping this banner activates rescue lifelines!
+                          </p>
+                        </div>
+
+                        {/* Change Date Alert */}
+                        <div className="bg-white border rounded-xl p-4 shadow-xs">
+                          <p className="text-[8px] font-extrabold text-slate-400 uppercase tracking-wider mb-2 font-bold">Rescheduling Control</p>
+                          <button
+                            onClick={() => {
+                              addLog("COMPLIANCE VERDICT: Rescheduling failed. Policy: 'Deadline is strictly Friday.'");
+                              setToastNotification("Blocked: Deadline is strictly Friday!");
+                              setTimeout(() => setToastNotification(null), 3000);
+                            }}
+                            className="w-full bg-[#0c244c] hover:bg-slate-900 text-white font-extrabold text-xs py-2 rounded-lg cursor-pointer flex items-center justify-center gap-1.5 uppercase font-bold"
+                          >
+                            <Clock className="w-3.5 h-3.5 text-emerald-400" /> Change Release Date
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ----------------- SCREEN 4: THE SMART RESCUE ----------------- */}
+                    {currentStoryScreen === 4 && (
+                      <div className="flex flex-col gap-4 animate-fadeIn text-left font-semibold">
+                        <div>
+                          <span className="text-[8px] font-black uppercase bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-mono font-bold">Screen 4: Smart Rescue</span>
+                          <h2 className="text-base font-black text-slate-900 mt-1 font-bold">Avoid Payout Bounce</h2>
+                          <p className="text-[10px] text-slate-500 mt-0.5 font-bold">Stitch detected a short pool for Friday. Choose an instant penalty-free lifeline:</p>
+                        </div>
+
+                        {isOverdraftRescueApplied ? (
+                          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 text-center flex flex-col items-center">
+                            <div className="w-10 h-10 bg-emerald-500 text-slate-950 rounded-full flex items-center justify-center mb-2 shadow-md"><Check className="w-6 h-6 stroke-[3]" /></div>
+                            <h3 className="text-sm font-black text-emerald-950 uppercase">Overdraft Rescued!</h3>
+                            <p className="text-[10.5px] text-slate-600 mt-1 max-w-xs font-semibold leading-relaxed">
+                              Your cash shortfall has been fully resolved. Your Friday Coffee Bean Cargo payment is guaranteed to clear.
+                            </p>
+                            <button
+                              onClick={() => {
+                                setIsOverdraftRescueApplied(false);
+                                setCurrentStoryScreen(1);
+                                setMobileTab('dashboard');
+                                addLog("STORY DECK: Smashed lifelines resolved. Returning to Global Dashboard.");
+                              }}
+                              className="mt-4 px-4 py-2 bg-[#0c244c] hover:bg-slate-900 text-white font-black text-[10px] rounded-lg cursor-pointer uppercase font-bold"
+                            >
+                              Return to Home
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col gap-2.5">
+                            <button
+                              onClick={() => {
+                                setIsOverdraftRescueApplied(true);
+                                addLog("LIFELINE: Smashed Fixed Savings Deposit to unlock £5,000.");
+                              }}
+                              className="w-full text-left p-3.5 bg-white border hover:bg-slate-50 border-slate-200 rounded-xl cursor-pointer flex items-center gap-3"
+                            >
+                              <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100 font-bold">🔨</div>
+                              <div>
+                                <p className="text-[11px] font-black text-slate-900 font-bold">Smashed Savings Glass</p>
+                                <p className="text-[8px] text-slate-400 uppercase mt-0.5 font-bold">Break fixed deposit early · penalty waived</p>
+                              </div>
+                            </button>
+
+                            <button
+                              onClick={() => {
+                                setIsOverdraftRescueApplied(true);
+                                addLog("LIFELINE: Authorized Working Capital Loan of £5,000.");
+                              }}
+                              className="w-full text-left p-3.5 bg-white border hover:bg-slate-50 border-slate-200 rounded-xl cursor-pointer flex items-center gap-3"
+                            >
+                              <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100 font-bold">💵</div>
+                              <div>
+                                <p className="text-[11px] font-black text-slate-900 font-bold">Working Capital Loan</p>
+                                <p className="text-[8px] text-slate-400 uppercase mt-0.5 font-bold">Instant low-interest credit line of £5,000</p>
+                              </div>
+                            </button>
+
+                            <button
+                              onClick={() => {
+                                setIsOverdraftRescueApplied(true);
+                                addLog("LIFELINE: Swapped liquidity pools from Standard Bank Escrow to clear deficit.");
+                              }}
+                              className="w-full text-left p-3.5 bg-white border hover:bg-slate-50 border-slate-200 rounded-xl cursor-pointer flex items-center gap-3"
+                            >
+                              <div className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 border border-indigo-100 font-bold font-bold">🌍</div>
+                              <div>
+                                <p className="text-[11px] font-black text-slate-900 font-bold">Transfer from Vietnam ZAR Pools</p>
+                                <p className="text-[8px] text-slate-400 uppercase mt-0.5 font-bold font-bold">Re-route internal foreign reserves instantly</p>
+                              </div>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* ----------------- SCREEN 5: THE CHAT SHORTCUT ----------------- */}
+                    {currentStoryScreen === 5 && (
+                      <div className="flex flex-col h-full justify-between animate-fadeIn text-left font-semibold">
+                        <div>
+                          <span className="text-[8px] font-black uppercase bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-full font-mono font-bold">Screen 5: Chat Shortcut</span>
+                          <h2 className="text-base font-black text-slate-900 mt-1 font-bold">WhatsApp Push</h2>
+                          <p className="text-[10px] text-slate-500 mt-0.5 font-bold">Simulating an external courier notification request fee.</p>
+                        </div>
+
+                        {whatsappActive ? (
+                          <div className="bg-emerald-50/20 border border-slate-200/80 rounded-2xl p-4 flex flex-col gap-3 h-[250px] justify-between">
+                            <div className="flex items-center gap-2 border-b pb-2">
+                              <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-xs">👨‍✈️</div>
+                              <div>
+                                <h4 className="text-xs font-black text-slate-900 leading-none font-bold">Courier Driver</h4>
+                                <span className="text-[7.5px] text-slate-400 font-bold font-mono">Active 2 mins ago</span>
+                              </div>
+                            </div>
+
+                            <div className="flex-1 flex flex-col justify-end gap-2.5 pb-2 text-xs">
+                              <div className="bg-slate-100 p-2.5 rounded-xl rounded-tl-none self-start max-w-[85%] text-slate-800 font-bold">
+                                I dropped off the boxes, please send the £200 fee! Here is my slip.
+                              </div>
+                            </div>
+
+                            <button
+                              onClick={() => {
+                                setCurrentStoryScreen(6);
+                                addLog("STORY DECK: Tap AI chip in chat. Automatically opening Camera (Screen 6) to verify receipt.");
+                              }}
+                              className="w-full bg-[#059669] hover:bg-emerald-600 text-white py-2.5 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 shadow-lg cursor-pointer animate-pulse uppercase font-bold"
+                            >
+                              <Sparkles className="w-3.5 h-3.5 text-white animate-spin" /> ✨ Pay £200 AI Chip
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col gap-3 py-6 items-center">
+                            {whatsappUnread && (
+                              <button
+                                onClick={() => {
+                                  setWhatsappActive(true);
+                                  setWhatsappUnread(false);
+                                  addLog("STORY DECK: WhatsApp push notification opened driver message thread.");
+                                }}
+                                className="w-full text-left bg-white border border-slate-200 rounded-2xl p-3.5 hover:shadow-md cursor-pointer flex items-start gap-3 relative overflow-hidden"
+                              >
+                                <span className="absolute right-0 top-0 bg-emerald-500 text-white text-[7px] font-black px-2 py-0.5 rounded-bl">WhatsApp</span>
+                                <div className="w-8 h-8 rounded-full bg-slate-100 text-xl flex items-center justify-center shrink-0">💬</div>
+                                <div className="min-w-0">
+                                  <h4 className="text-[11px] font-black text-slate-900 font-bold">DHL Delivery Driver</h4>
+                                  <p className="text-[10px] text-slate-500 truncate font-semibold mt-0.5 font-bold">I dropped off the boxes, please send the £200 fee...</p>
+                                </div>
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* ----------------- SCREEN 6: THE MAGIC CAMERA ----------------- */}
+                    {currentStoryScreen === 6 && (
+                      <div className="flex flex-col gap-4 animate-fadeIn text-left font-semibold">
+                        <div>
+                          <span className="text-[8px] font-black uppercase bg-violet-100 text-violet-800 px-2 py-0.5 rounded-full font-mono font-bold">Screen 6: Magic Camera</span>
+                          <h2 className="text-base font-black text-slate-900 mt-1 font-bold">Magic Camera Scanner</h2>
+                          <p className="text-[10px] text-slate-500 mt-0.5 font-bold">Point lens at paper slip to extract zero-typo fields.</p>
+                        </div>
+
+                        {isCameraCaptured ? (
+                          <div className="bg-slate-50 border rounded-2xl p-4 flex flex-col gap-3 text-left">
+                            <div className="bg-[#0c244c] text-white p-3 rounded-xl">
+                              <p className="text-[8px] font-black uppercase tracking-wider text-teal-300">extracted parameters</p>
+                              <p className="text-sm font-black font-mono mt-1 font-bold">DHL LOGISTICS CORP</p>
+                              <div className="flex justify-between items-center text-[10px] font-mono mt-2 pt-1.5 border-t border-white/10 font-bold">
+                                <span>AMOUNT: £200.00</span>
+                                <span>TAX: £18.00</span>
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => {
+                                setCurrentStoryScreen(7);
+                                addLog("STORY DECK: OCR fields locked. Advancing to Screen 7 (AI Reader) to read terms.");
+                              }}
+                              className="w-full bg-[#0c244c] hover:bg-slate-900 text-white font-black py-2 rounded-xl text-xs cursor-pointer uppercase font-bold"
+                            >
+                              Read Terms & Conditions (Screen 7)
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="bg-slate-950 rounded-3xl overflow-hidden aspect-[4/3] relative flex items-center justify-center border border-slate-800">
+                            <div className="absolute inset-0 bg-slate-900/40 flex flex-col items-center justify-center p-4">
+                              <div className="bg-white text-slate-900 p-2.5 rounded shadow-lg text-[7px] font-mono w-32 border-2 border-slate-300">
+                                <p className="font-black text-center border-b pb-1 mb-1 font-bold">DHL INVOICE</p>
+                                <p>ITEM: CARGO EXPRESS</p>
+                                <p>AMT: £200.00</p>
+                                <p>TAX: £18.00</p>
+                              </div>
+                            </div>
+
+                            <button
+                              onClick={() => {
+                                setIsCameraFocused(true);
+                                addLog("CAMERA: Captured focal coordinate parameters on paper invoice.");
+                              }}
+                              className={`absolute w-16 h-16 border-2 transition-all duration-300 flex items-center justify-center ${isCameraFocused ? 'border-emerald-400 scale-95' : 'border-white animate-pulse'}`}
+                            >
+                              <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />
+                            </button>
+
+                            <div className="absolute bottom-2 inset-x-0 flex justify-center">
+                              <button
+                                onClick={() => {
+                                  setIsCameraCaptured(true);
+                                  addLog("CAMERA: Paper receipt captured. Commenced instant AI OCR extraction.");
+                                }}
+                                className="w-10 h-10 bg-white hover:bg-slate-200 border-4 border-slate-700 rounded-full flex items-center justify-center cursor-pointer"
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* ----------------- SCREEN 7: THE AI READER ----------------- */}
+                    {currentStoryScreen === 7 && (
+                      <div className="flex flex-col gap-4 animate-fadeIn text-left font-semibold">
+                        <div>
+                          <span className="text-[8px] font-black uppercase bg-[#0c244c]/10 text-[#0c244c] px-2 py-0.5 rounded-full font-mono font-bold">Screen 7: AI Reader</span>
+                          <h2 className="text-base font-black text-slate-900 mt-1 font-bold">The Cliff Notes</h2>
+                          <p className="text-[10px] text-slate-500 mt-0.5 font-bold">Skip 10 pages of legal jargon with modern on-device summarization assistants.</p>
+                        </div>
+
+                        <div className="bg-white border rounded-2xl p-4 max-h-[160px] overflow-y-auto text-[8px] font-semibold text-slate-400 leading-normal font-mono scrollbar-thin">
+                          <p className="font-bold text-slate-700 mb-1">DHL LOGISTICS CONTRACT CLAUSE 992-B</p>
+                          <p>WHEREAS, the consignor wishes to execute payment of express logistics transport fees under terms of regional standard liability acts, and Whereas the recipient accepts standard courier delivery timelines...</p>
+                          <p className="mt-2">FURTHERMORE, the consignor waives direct collateral refunds upon dropoff signature confirmation, under penalty of standard liability limits set forward under South Africa-UK maritime networks...</p>
+                          <p className="mt-2">THEREFORE, immediate clearance of £200.00 is strictly due upon arrival of delivery nodes. Failure to execute payout clearances grants the carrier lien over shipping containers...</p>
+                        </div>
+
+                        {isContractSummarized ? (
+                          <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-3 text-left">
+                            <p className="text-[8px] font-black uppercase tracking-wider text-emerald-800">✨ AI Executive Summary</p>
+                            <ul className="text-[9.5px] text-slate-700 list-disc list-inside mt-1 flex flex-col gap-1 font-bold">
+                              <li>Pay £200.</li>
+                              <li>Due today.</li>
+                              <li>No refunds.</li>
+                            </ul>
+                            <button
+                              onClick={() => {
+                                setCurrentStoryScreen(8);
+                                setMobileTab('authorisations');
+                                addLog("STORY DECK: Document signed. Transitioning to Screen 8 (The Workspace) to execute approvals.");
+                              }}
+                              className="w-full mt-3 bg-[#0c244c] hover:bg-slate-900 text-white font-black py-2 rounded-xl text-xs cursor-pointer uppercase font-bold"
+                            >
+                              Submit for Approval (Screen 8)
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              setIsContractSummarized(true);
+                              addLog("AI READ: Compressed 10-page dense cargo contract into 3 core bullets.");
+                            }}
+                            className="w-full bg-[#059669] hover:bg-emerald-600 text-white py-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/10 cursor-pointer uppercase font-bold"
+                          >
+                            <Sparkles className="w-3.5 h-3.5 text-white" /> AI Summarize (Screen 7)
+                          </button>
+                        )}
+                      </div>
+                    )}
+
                     {/* ----------------- SCREEN 1: DASHBOARD TAB ----------------- */}
-                    {mobileTab === 'dashboard' && (
+                    {mobileTab === 'dashboard' && currentStoryScreen === 1 && (
                       <div className="flex flex-col gap-4 animate-fadeIn text-left font-semibold">
                         
                         {/* Header Details with Currency Dropdown & Hide Balances */}
@@ -1234,7 +1680,7 @@ export default function App() {
                         <div className="sticky bottom-0 left-0 right-0 pt-2 pb-1 bg-gradient-to-t from-slate-50 via-slate-50/95 to-transparent z-15 flex justify-center">
                           <button
                             onClick={() => {
-                              setMobileTab('authorisations');
+                              setCurrentStoryScreen(2);
                               addLog(`TIME MACHINE: Navigated from Global Dashboard (Screen 1) to Screen 2 (Time Machine slider projection screen).`);
                             }}
                             className="bg-[#0c244c] hover:bg-slate-900 text-emerald-400 border border-emerald-500/20 font-black text-[9px] tracking-widest px-4 py-2 rounded-full shadow-lg flex items-center gap-1.5 cursor-pointer uppercase animate-pulse"
@@ -1247,7 +1693,7 @@ export default function App() {
                     )}
 
                     {/* ----------------- SCREEN 2: PAYMENTS HISTORY TAB ----------------- */}
-                    {mobileTab === 'payments' && (
+                    {mobileTab === 'payments' && currentStoryScreen === 10 && (
                       <div className="flex flex-col gap-3 animate-fadeIn text-left font-semibold">
                         
                         {/* Sticky Header & Filter Bar for Payments */}
@@ -1314,7 +1760,7 @@ export default function App() {
                     )}
 
                     {/* ----------------- SCREEN 3: WORKSPACE TAB (Filters & Lists) ----------------- */}
-                    {mobileTab === 'authorisations' && (
+                    {mobileTab === 'authorisations' && currentStoryScreen === 8 && (
                       <div className="flex flex-col gap-1.5 animate-fadeIn text-left relative">
                         
                         {/* Sticky Header & Filter Bar for Workspace */}
@@ -1409,7 +1855,7 @@ export default function App() {
                     )}
 
                     {/* ----------------- SCREEN 4: CHAT TAB ----------------- */}
-                    {mobileTab === 'chat' && (
+                    {mobileTab === 'chat' && currentStoryScreen === 9 && (
                       <div className="flex flex-col h-full min-h-[385px] justify-between animate-fadeIn text-left font-semibold">
                         
                         {/* Header Details */}
@@ -1540,7 +1986,7 @@ export default function App() {
                     )}
 
                     {/* ----------------- SCREEN 5: PROFILE TAB ----------------- */}
-                    {mobileTab === 'profile' && (
+                    {mobileTab === 'profile' && currentStoryScreen === 11 && (
                       <div className="flex flex-col gap-4 animate-fadeIn text-left font-semibold">
                         <div className="bg-white border rounded-2xl p-4 text-center shadow-xs">
                           <div className="w-12 h-12 bg-[#0c244c] rounded-full flex items-center justify-center text-white font-bold text-base mx-auto mb-2 border">FF</div>
@@ -1675,27 +2121,27 @@ export default function App() {
                   {/* PERSISTENT BOTTOM NAVIGATION TAB BAR (Dashboard, Payments, Workspace, Chat, Profile) */}
                   <div className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 z-45">
                     <div className="grid grid-cols-5 h-14 pb-safe select-none">
-                      <button onClick={() => setMobileTab('dashboard')} className={`flex flex-col items-center justify-center text-slate-400 hover:text-slate-900 transition-colors ${mobileTab === 'dashboard' ? 'text-emerald-600 font-extrabold' : ''}`}>
+                      <button onClick={() => { setMobileTab('dashboard'); setCurrentStoryScreen(1); }} className={`flex flex-col items-center justify-center text-slate-400 hover:text-slate-900 transition-colors ${mobileTab === 'dashboard' ? 'text-emerald-600 font-extrabold' : ''}`}>
                         <LayoutDashboard className="w-4 h-4" /><span className="text-[8px] font-extrabold mt-1 tracking-tighter uppercase">Dashboard</span>
                       </button>
-                      <button onClick={() => setMobileTab('payments')} className={`flex flex-col items-center justify-center text-slate-400 hover:text-slate-900 transition-colors ${mobileTab === 'payments' ? 'text-emerald-600 font-extrabold' : ''}`}>
+                      <button onClick={() => { setMobileTab('payments'); setCurrentStoryScreen(10); }} className={`flex flex-col items-center justify-center text-slate-400 hover:text-slate-900 transition-colors ${mobileTab === 'payments' ? 'text-emerald-600 font-extrabold' : ''}`}>
                         <DollarSign className="w-4 h-4" /><span className="text-[8px] font-extrabold mt-1 tracking-tighter uppercase">Payments</span>
                       </button>
-                      <button onClick={() => setMobileTab('authorisations')} className={`flex flex-col items-center justify-center text-slate-400 hover:text-[#0c244c] transition-colors relative ${mobileTab === 'authorisations' ? 'text-emerald-600 font-extrabold' : ''}`}>
+                      <button onClick={() => { setMobileTab('authorisations'); setCurrentStoryScreen(8); }} className={`flex flex-col items-center justify-center text-slate-400 hover:text-[#0c244c] transition-colors relative ${mobileTab === 'authorisations' ? 'text-emerald-600 font-extrabold' : ''}`}>
                         <div className="relative">
                           <ShieldAlert className="w-4 h-4" />
                           {pendingItems.length > 0 && <span className="absolute -top-1.5 -right-2 bg-rose-500 text-white rounded-full text-[7px] font-black w-3.5 h-3.5 flex items-center justify-center font-mono">{pendingItems.length}</span>}
                         </div>
                         <span className="text-[8px] font-extrabold mt-1 tracking-tighter uppercase">Workspace</span>
                       </button>
-                      <button onClick={() => setMobileTab('chat')} className={`flex flex-col items-center justify-center text-slate-400 hover:text-slate-900 transition-colors relative ${mobileTab === 'chat' ? 'text-emerald-600 font-extrabold' : ''}`}>
+                      <button onClick={() => { setMobileTab('chat'); setCurrentStoryScreen(9); }} className={`flex flex-col items-center justify-center text-slate-400 hover:text-slate-900 transition-colors relative ${mobileTab === 'chat' ? 'text-emerald-600 font-extrabold' : ''}`}>
                         <div className="relative">
                           <MessageSquare className="w-4 h-4" />
                           {walkieTalkieActive && walkieTalkieStep < 6 && <span className="absolute -top-1.5 -right-1.5 bg-indigo-500 w-2 h-2 rounded-full animate-ping" />}
                         </div>
                         <span className="text-[8px] font-extrabold mt-1 tracking-tighter uppercase">Chat</span>
                       </button>
-                      <button onClick={() => setMobileTab('profile')} className={`flex flex-col items-center justify-center text-slate-400 hover:text-slate-900 transition-colors ${mobileTab === 'profile' ? 'text-emerald-600 font-extrabold' : ''}`}>
+                      <button onClick={() => { setMobileTab('profile'); setCurrentStoryScreen(11); }} className={`flex flex-col items-center justify-center text-slate-400 hover:text-slate-900 transition-colors ${mobileTab === 'profile' ? 'text-emerald-600 font-extrabold' : ''}`}>
                         <User className="w-4 h-4" /><span className="text-[8px] font-extrabold mt-1 tracking-tighter uppercase">Profile</span>
                       </button>
                     </div>
