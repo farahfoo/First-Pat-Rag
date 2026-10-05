@@ -1611,11 +1611,34 @@ export default function App() {
                           </div>
                         </div>
 
+                        {/* Time Machine Sticky Pill Button Card */}
+                        <div 
+                          onClick={() => {
+                            setCurrentStoryScreen(2);
+                            addLog(`TIME MACHINE: Tap card to launch Screen 2 (Crystal Ball Future Cash Flow timeline).`);
+                          }}
+                          className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-3.5 text-white shadow-md flex items-center justify-between cursor-pointer hover:shadow-lg transition-all transform active:scale-98 text-left"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-white">
+                              <Clock className="w-4 h-4 text-emerald-300 animate-pulse" />
+                            </div>
+                            <div>
+                              <div className="text-xs font-black flex items-center gap-1.5">
+                                <span className="font-bold text-white font-bold">Time Machine: Future Cash Flow</span>
+                                <span className="bg-emerald-500/25 text-emerald-300 text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md font-mono font-bold">Crystal Ball</span>
+                              </div>
+                              <p className="text-[10px] text-slate-200 opacity-90 mt-0.5 font-semibold leading-none">Simulate 30-day runway, cash burn & bills</p>
+                            </div>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-slate-200" />
+                        </div>
+
                         {/* Recent activity vertical list with infinite scroll */}
                         <div className="bg-white border border-slate-200 rounded-2xl p-4 text-left shadow-xs flex flex-col">
                           <div className="flex items-center justify-between mb-3 pb-1 border-b border-slate-100">
                             <p className="text-[10px] font-black uppercase text-[#0c244c] tracking-wider">Recent Activity Ledger</p>
-                            <span className="text-[8px] font-black uppercase bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded font-mono">Infinite Scroll</span>
+                            <span className="text-[8px] font-black uppercase bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded font-mono font-bold">Infinite Scroll</span>
                           </div>
 
                           {/* Segmented Account Filter for Recent Activity */}
@@ -1647,7 +1670,7 @@ export default function App() {
                             {dashboardTransactions.length === 0 ? (
                               <p className="text-center py-6 text-[10px] text-slate-400 font-bold font-semibold">No recent transactions recorded for this account filter.</p>
                             ) : (
-                              dashboardTransactions.map(tx => (
+                              dashboardTransactions.slice(0, 10).map(tx => (
                                 <div
                                   key={tx.id}
                                   onClick={() => { setSelectedItemForDetail(tx); setSelectedAudit(tx); }}
@@ -1673,20 +1696,20 @@ export default function App() {
                                 </div>
                               ))
                             )}
-                          </div>
-                        </div>
 
-                        {/* Sticky bottom mini tab: Time Machine (tap -> Screen 2) */}
-                        <div className="sticky bottom-0 left-0 right-0 pt-2 pb-1 bg-gradient-to-t from-slate-50 via-slate-50/95 to-transparent z-15 flex justify-center">
-                          <button
-                            onClick={() => {
-                              setCurrentStoryScreen(2);
-                              addLog(`TIME MACHINE: Navigated from Global Dashboard (Screen 1) to Screen 2 (Time Machine slider projection screen).`);
-                            }}
-                            className="bg-[#0c244c] hover:bg-slate-900 text-emerald-400 border border-emerald-500/20 font-black text-[9px] tracking-widest px-4 py-2 rounded-full shadow-lg flex items-center gap-1.5 cursor-pointer uppercase animate-pulse"
-                          >
-                            <Clock className="w-3 h-3 text-emerald-400 animate-spin" style={{ animationDuration: '4s' }} /> Time Machine (Screen 2)
-                          </button>
+                            {dashboardTransactions.length > 10 && (
+                              <button
+                                onClick={() => {
+                                  setMobileTab('payments');
+                                  setCurrentStoryScreen(10);
+                                  addLog(`DASHBOARD: Clicked 'View More' on Recent Activity, routing to Payments ledger (Screen 10).`);
+                                }}
+                                className="mt-2 w-full py-2 bg-slate-50 hover:bg-slate-100 text-[#0c244c] font-black text-[9px] rounded-xl text-center uppercase tracking-widest cursor-pointer font-bold border border-slate-200/30"
+                              >
+                                View More Activity
+                              </button>
+                            )}
+                          </div>
                         </div>
 
                       </div>
