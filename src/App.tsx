@@ -144,9 +144,9 @@ const mockData = {
     VND: { symbol: '₫', rate: 25000.0 }
   },
   accounts: [
-    { id: 'acc-01', bank: 'Stitch Treasury Hub', balance: 1424900.52, type: 'Operating' },
-    { id: 'acc-02', bank: 'Barclays VIP Reserve', balance: 850300.11, type: 'Collateral' },
-    { id: 'acc-03', bank: 'Standard Bank Escrow', balance: 350000.00, type: 'Liquidity' }
+    { id: 'acc-01', bank: 'Stitch Treasury Hub', balance: 1424900.52, type: 'Operating', currency: 'USD' },
+    { id: 'acc-02', bank: 'Barclays VIP Reserve', balance: 850300.11, type: 'Collateral', currency: 'GBP' },
+    { id: 'acc-03', bank: 'Standard Bank Escrow', balance: 350000.00, type: 'Liquidity', currency: 'ZAR' }
   ],
   transactions: [
     // 4 Initial Core Items (High Urgencies)
@@ -253,6 +253,7 @@ export default function App() {
   const [visibleCount, setVisibleCount] = useState<number>(15);
   const [bankAccounts, setBankAccounts] = useState(mockData.accounts);
   const [selectedAccountId, setSelectedAccountId] = useState('acc-01');
+  const [activityAccountFilter, setActivityAccountFilter] = useState<string>('All');
   const [eftPayInOpen, setEftPayInOpen] = useState(false);
   const [eftAmount, setEftAmount] = useState('25000');
   const [eftOriginBank, setEftOriginBank] = useState('First National Bank (FNB)');
@@ -315,9 +316,22 @@ export default function App() {
     return usdAmount * targetRate;
   };
 
+  // Dynamically assign accountIds to transactions if they don't have one, to make sure filter by account works flawlessly
+  const transactionsWithAccount = useMemo(() => {
+    return transactions.map((tx, idx) => {
+      let accountId = 'acc-01'; // Default to Stitch Hub
+      if (tx.currency === 'GBP' || idx % 3 === 1) {
+        accountId = 'acc-02'; // Barclays
+      } else if (tx.currency === 'ZAR' || idx % 3 === 2) {
+        accountId = 'acc-03'; // Standard Bank
+      }
+      return { ...tx, accountId };
+    });
+  }, [transactions]);
+
   // Filter & Sort Logic for pending lists (Workspace tab)
   const filteredPendingTransactions = useMemo(() => {
-    let result = transactions.filter(tx => tx.status === 'Pending');
+    let result = transactionsWithAccount.filter(tx => tx.status === 'Pending');
 
     // Filter by urgency
     if (urgencyFilter !== 'All') {
@@ -352,7 +366,7 @@ export default function App() {
 
   // History list for Payments tab
   const filteredPaymentsHistory = useMemo(() => {
-    let result = [...transactions];
+    let result = [...transactionsWithAccount];
     if (paymentsStatusFilter !== 'All') {
       result = result.filter(tx => tx.status === paymentsStatusFilter);
     }
@@ -365,7 +379,7 @@ export default function App() {
       );
     }
     return result;
-  }, [transactions, paymentsStatusFilter, paymentSearch]);
+  }, [transactionsWithAccount, paymentsStatusFilter, paymentSearch]);
 
   const slicedPendingTransactions = useMemo(() => {
     return filteredPendingTransactions.slice(0, visibleCount);
@@ -374,6 +388,14 @@ export default function App() {
   const slicedPaymentsHistory = useMemo(() => {
     return filteredPaymentsHistory.slice(0, visibleCount);
   }, [filteredPaymentsHistory, visibleCount]);
+
+  const dashboardTransactions = useMemo(() => {
+    let result = slicedPaymentsHistory;
+    if (activityAccountFilter !== 'All') {
+      result = result.filter(tx => tx.accountId === activityAccountFilter);
+    }
+    return result;
+  }, [slicedPaymentsHistory, activityAccountFilter]);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
@@ -1091,13 +1113,22 @@ export default function App() {
                                   setSelectedAccountId(acc.id);
                                   addLog(`BANK SWITCH: Switched primary dashboard context to ${acc.bank}.`);
                                 }}
-                                className={`snap-center shrink-0 w-[145px] text-left p-3 rounded-xl border text-xs transition-all cursor-pointer ${acc.id === selectedAccountId ? 'bg-[#0c244c] text-white border-[#0c244c] shadow-md ring-2 ring-emerald-500/10' : 'bg-slate-50 text-slate-800 border-slate-200/80 hover:bg-slate-100'}`}
+                                className={`snap-center shrink-0 w-[145px] text-left p-3 rounded-xl border text-xs transition-all cursor-pointer flex flex-col justify-between h-[85px] ${acc.id === selectedAccountId ? 'bg-[#0c244c] text-white border-[#0c244c] shadow-md ring-2 ring-emerald-500/10' : 'bg-slate-50 text-slate-800 border-slate-200/80 hover:bg-slate-100'}`}
                               >
-                                <p className={`text-[7.5px] font-extrabold uppercase truncate ${acc.id === selectedAccountId ? 'text-teal-300' : 'text-slate-400'}`}>{acc.bank}</p>
-                                <p className="text-[7.5px] font-bold text-slate-400 uppercase mt-0.5">{acc.type} account</p>
-                                <p className={`font-mono font-black mt-2 text-xs tabular-nums ${blurBalances ? 'filter blur-xs' : ''}`}>
-                                  {getCurrencySymbol(selectedCurrency)}{convertBalance(acc.balance).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                </p>
+                                <div>
+                                  <p className={`text-[7.5px] font-extrabold uppercase truncate ${acc.id === selectedAccountId ? 'text-teal-300' : 'text-slate-400'}`}>{acc.bank}</p>
+                                  <p className="text-[7px] font-bold text-slate-400 uppercase leading-none">{acc.type}</p>
+                                </div>
+                                <div className="mt-1">
+                                  {/* Converted Balance */}
+                                  <p className={`font-mono font-black text-xs tabular-nums ${blurBalances ? 'filter blur-xs' : ''}`}>
+                                    {getCurrencySymbol(selectedCurrency)}{convertBalance(acc.balance).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                  </p>
+                                  {/* Native Balance */}
+                                  <p className={`text-[7.5px] font-bold font-mono tracking-tight mt-0.5 ${acc.id === selectedAccountId ? 'text-slate-300' : 'text-slate-500'} ${blurBalances ? 'filter blur-xs' : ''}`}>
+                                    Native: {getCurrencySymbol(acc.currency)}{acc.balance.toLocaleString(undefined, { maximumFractionDigits: 0 })} {acc.currency}
+                                  </p>
+                                </div>
                               </button>
                             ))}
                           </div>
@@ -1109,27 +1140,57 @@ export default function App() {
                             <p className="text-[10px] font-black uppercase text-[#0c244c] tracking-wider">Recent Activity Ledger</p>
                             <span className="text-[8px] font-black uppercase bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded font-mono">Infinite Scroll</span>
                           </div>
-                          <div className="flex flex-col gap-2.5">
-                            {slicedPaymentsHistory.map(tx => (
-                              <div
-                                key={tx.id}
-                                onClick={() => { setSelectedItemForDetail(tx); setSelectedAudit(tx); }}
-                                className="flex items-center justify-between p-2 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer border border-transparent hover:border-slate-100"
+
+                          {/* Segmented Account Filter for Recent Activity */}
+                          <div className="flex items-center gap-1 p-0.5 bg-slate-100 rounded-lg mb-3">
+                            <button
+                              onClick={() => {
+                                setActivityAccountFilter('All');
+                                addLog(`ACTIVITY FILTER: Showing recent transactions for All Accounts.`);
+                              }}
+                              className={`flex-1 py-1 text-[8px] font-extrabold rounded-md transition-colors cursor-pointer text-center ${activityAccountFilter === 'All' ? 'bg-[#0c244c] text-white shadow-xs' : 'text-slate-500 hover:text-slate-950'}`}
+                            >
+                              All
+                            </button>
+                            {bankAccounts.map(acc => (
+                              <button
+                                key={acc.id}
+                                onClick={() => {
+                                  setActivityAccountFilter(acc.id);
+                                  addLog(`ACTIVITY FILTER: Filtering activity feed by ${acc.bank}.`);
+                                }}
+                                className={`flex-1 py-1 text-[8px] font-extrabold rounded-md transition-all cursor-pointer text-center truncate ${activityAccountFilter === acc.id ? 'bg-[#0c244c] text-white shadow-xs' : 'text-slate-500 hover:text-slate-950'}`}
                               >
-                                <div className="flex items-center gap-2.5 min-w-0">
-                                  <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 border ${tx.status === 'Approved' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : (tx.status === 'Rejected' ? 'bg-rose-50 text-rose-600 border-rose-100' : 'bg-amber-50 text-amber-600 border-amber-100')}`}>
-                                    {tx.status === 'Approved' ? <ArrowUpRight className="w-3.5 h-3.5" /> : (tx.status === 'Rejected' ? <X className="w-3.5 h-3.5" /> : <Clock className="w-3.5 h-3.5" />)}
-                                  </div>
-                                  <div className="min-w-0">
-                                    <p className="text-[11px] font-extrabold text-[#0c244c] truncate font-bold">{tx.beneficiary}</p>
-                                    <p className="text-[8px] text-slate-400 font-bold uppercase mt-0.5">{tx.id} · {tx.type}</p>
-                                  </div>
-                                </div>
-                                <p className={`text-[11px] font-black font-mono text-slate-900 ${blurBalances ? 'filter blur-sm select-none' : ''}`}>
-                                  {getCurrencySymbol(selectedCurrency)}{convertBalance(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                </p>
-                              </div>
+                                {acc.bank.split(' ')[0]}
+                              </button>
                             ))}
+                          </div>
+
+                          <div className="flex flex-col gap-2.5">
+                            {dashboardTransactions.length === 0 ? (
+                              <p className="text-center py-6 text-[10px] text-slate-400 font-bold font-semibold">No recent transactions recorded for this account filter.</p>
+                            ) : (
+                              dashboardTransactions.map(tx => (
+                                <div
+                                  key={tx.id}
+                                  onClick={() => { setSelectedItemForDetail(tx); setSelectedAudit(tx); }}
+                                  className="flex items-center justify-between p-2 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer border border-transparent hover:border-slate-100"
+                                >
+                                  <div className="flex items-center gap-2.5 min-w-0">
+                                    <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 border ${tx.status === 'Approved' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : (tx.status === 'Rejected' ? 'bg-rose-50 text-rose-600 border-rose-100' : 'bg-amber-50 text-amber-600 border-amber-100')}`}>
+                                      {tx.status === 'Approved' ? <ArrowUpRight className="w-3.5 h-3.5" /> : (tx.status === 'Rejected' ? <X className="w-3.5 h-3.5" /> : <Clock className="w-3.5 h-3.5" />)}
+                                    </div>
+                                    <div className="min-w-0">
+                                      <p className="text-[11px] font-extrabold text-[#0c244c] truncate font-bold">{tx.beneficiary}</p>
+                                      <p className="text-[8px] text-slate-400 font-bold uppercase mt-0.5">{tx.id} · {tx.type}</p>
+                                    </div>
+                                  </div>
+                                  <p className={`text-[11px] font-black font-mono text-slate-900 ${blurBalances ? 'filter blur-sm select-none' : ''}`}>
+                                    {getCurrencySymbol(selectedCurrency)}{convertBalance(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                  </p>
+                                </div>
+                              ))
+                            )}
                           </div>
                         </div>
 
