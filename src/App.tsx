@@ -270,6 +270,7 @@ export default function App() {
   // Create Payment State
   const [isCreatePaymentModalOpen, setIsCreatePaymentModalOpen] = useState(false);
   const [isPathwayMapOpen, setIsPathwayMapOpen] = useState(false);
+  const [isManageTreasuryOpen, setIsManageTreasuryOpen] = useState(false);
   const [newPayee, setNewPayee] = useState('');
   const [newPayoutAmount, setNewPayoutAmount] = useState('');
   const [newCurrency, setNewCurrency] = useState('GBP');
@@ -1192,6 +1193,147 @@ export default function App() {
                     )}
                   </AnimatePresence>
 
+                  {/* FULL-SCREEN SUB-PAGE: MANAGE TREASURY CONTROLLER */}
+                  <AnimatePresence>
+                    {isManageTreasuryOpen && (
+                      <motion.div 
+                        initial={{ x: '100%' }}
+                        animate={{ x: 0 }}
+                        exit={{ x: '100%' }}
+                        transition={{ type: 'spring', damping: 25, stiffness: 220 }}
+                        className="absolute inset-0 bg-slate-50 z-45 flex flex-col text-slate-900 font-semibold"
+                      >
+                        {/* Subpage Header */}
+                        <div className="bg-[#0c244c] text-white px-4 py-4 flex items-center justify-between shadow-md shrink-0">
+                          <button 
+                            onClick={() => setIsManageTreasuryOpen(false)}
+                            className="flex items-center gap-1 text-[11px] text-slate-300 hover:text-white cursor-pointer font-bold"
+                          >
+                            <span>◀ Back</span>
+                          </button>
+                          <h3 className="text-xs font-black uppercase tracking-widest text-center">Treasury Hub</h3>
+                          <div className="w-8" />
+                        </div>
+
+                        {/* Subpage Content Scrollbody */}
+                        <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 text-left">
+                          <div>
+                            <span className="text-[8px] font-black uppercase bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-mono font-bold">Stitch liquidity management</span>
+                            <h2 className="text-base font-black text-slate-900 mt-1 font-bold">Treasury Optimizer</h2>
+                            <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed font-bold">Perform instant cross-border yield sweeps and pool rebalancing.</p>
+                          </div>
+
+                          {/* Multi-Entity Cash Pools List */}
+                          <div className="bg-white border rounded-2xl p-4 shadow-xs">
+                            <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-3 font-bold">Active Liquidity Pools</p>
+                            <div className="flex flex-col gap-3">
+                              {[
+                                { name: "Barclays London Pool", balance: "£145,000", cap: "98% target", status: "Optimal", color: "bg-emerald-500" },
+                                { name: "Standard Bank Escrow", balance: "R4,200,000", cap: "76% target", status: "Sufficient", color: "bg-blue-500" },
+                                { name: "Techcombank Cargo Vietnam", balance: "₫14,000,000", cap: "Short pool for Friday", status: "Critical Hold", color: "bg-rose-500 animate-pulse" }
+                              ].map((pool, idx) => (
+                                <div key={idx} className="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-100">
+                                  <div>
+                                    <p className="text-[11px] font-extrabold text-[#0c244c]">{pool.name}</p>
+                                    <p className="text-[8px] text-slate-400 font-bold uppercase mt-0.5 font-bold">{pool.cap}</p>
+                                  </div>
+                                  <div className="text-right">
+                                    <p className="text-[11px] font-black font-mono text-slate-900">{pool.balance}</p>
+                                    <span className={`inline-block text-[7.5px] font-black uppercase text-white px-1.5 py-0.2 rounded mt-1 font-bold ${pool.color}`}>{pool.status}</span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Smart Rebalance Sweeper Box */}
+                          <div className="bg-slate-900 text-white rounded-2xl p-4 border border-slate-800 shadow-sm relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-2 opacity-10">
+                              <TrendingUp className="w-16 h-16 text-emerald-400" />
+                            </div>
+                            <p className="text-[8px] font-black uppercase tracking-widest text-emerald-400 font-bold">Intelligent Liquidity Sweep</p>
+                            <p className="text-[10px] text-slate-300 mt-1 leading-normal font-semibold">
+                              Stitch AI detected critical Friday cargo settlement queues in Vietnam. Rebalance Ho Chi Minh techcombank buffer with Cape Town Standard Bank escrow reserves?
+                            </p>
+                            
+                            <button
+                              onClick={() => {
+                                addLog("TREASURY ENGINE: Initiated multi-entity liquidity sweep. Auto-converted ZAR 220,000 standard bank pool to Techcombank VND 280,000,000 pool.");
+                                setToastNotification("Success: Swept & Rebalanced techcombank cargo pool!");
+                                setTimeout(() => setToastNotification(null), 3000);
+                              }}
+                              className="mt-3 w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[10px] py-2.5 rounded-xl text-center uppercase tracking-wider cursor-pointer font-bold transition-colors"
+                            >
+                              ⚡ Execute AI Rebalance Sweep
+                            </button>
+                          </div>
+
+                          {/* Instant Forex FX Conversion widget */}
+                          <div className="bg-white border rounded-2xl p-4 shadow-xs">
+                            <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-3 font-bold">Instant Forex Conversion (FX)</p>
+                            
+                            <div className="flex flex-col gap-2.5 text-xs">
+                              <div>
+                                <label className="block text-[8.5px] text-slate-400 uppercase tracking-wider mb-1 font-bold">Source Currency Pool</label>
+                                <select className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 outline-none font-bold text-[#0c244c]">
+                                  <option value="ZAR">Standard Bank ZAR Pool (Escrow)</option>
+                                  <option value="GBP">Barclays London GBP Pool (Treasury)</option>
+                                </select>
+                              </div>
+
+                              <div>
+                                <label className="block text-[8.5px] text-slate-400 uppercase tracking-wider mb-1 font-bold">Target Settlement Pool</label>
+                                <select className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 outline-none font-bold text-[#0c244c]">
+                                  <option value="VND">Techcombank VND Pool (Cargo releases)</option>
+                                  <option value="EUR">Euros VIP Reserve Pool</option>
+                                </select>
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-2">
+                                <div>
+                                  <label className="block text-[8.5px] text-slate-400 uppercase tracking-wider mb-1 font-bold">Amount to Swap</label>
+                                  <input 
+                                    type="number" 
+                                    placeholder="50,000" 
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 outline-none font-mono font-semibold" 
+                                  />
+                                </div>
+                                <div className="flex flex-col justify-end">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      addLog("FX CORE: Swap execution successful. Settled GBP 50,000 to Techcombank VND pool at spot rate 1.054.");
+                                      setToastNotification("FX Conversion Wire Successful!");
+                                      setTimeout(() => setToastNotification(null), 3000);
+                                    }}
+                                    className="w-full bg-[#0c244c] hover:bg-slate-900 text-white font-black text-[10px] py-2 rounded-lg text-center uppercase tracking-wider cursor-pointer font-bold"
+                                  >
+                                    Execute Swap
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Historical yield chart */}
+                          <div className="bg-white border rounded-2xl p-4 shadow-xs flex flex-col">
+                            <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1 font-bold">Historical Treasury Yield</p>
+                            <p className="text-[9px] text-slate-500 font-bold">Consolidated daily returns optimization rates</p>
+                            <div className="h-20 w-full mt-2.5 flex items-end gap-1.5 justify-between pb-1">
+                              {[34, 45, 60, 52, 70, 85, 90, 75, 80, 95, 100, 110].map((val, i) => (
+                                <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                                  <div className="w-full bg-indigo-100 rounded-t-sm hover:bg-indigo-600 transition-colors cursor-pointer" style={{ height: `${val * 0.5}px` }} />
+                                  <span className="text-[6.5px] font-mono text-slate-400">{i+1}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
                   {/* Sticky Notification Toast inside phone */}
                   <AnimatePresence>
                     {isAllPendingSelected && mobileTab === 'authorisations' && (
@@ -1843,6 +1985,19 @@ export default function App() {
                               </button>
                             )}
                           </div>
+                        </div>
+
+                        {/* Manage Treasury Dashboard Button */}
+                        <div className="mt-3 shrink-0">
+                          <button
+                            onClick={() => {
+                              setIsManageTreasuryOpen(true);
+                              addLog("DASHBOARD: Opened Manage Treasury hub subpage.");
+                            }}
+                            className="w-full bg-[#0c244c] hover:bg-[#071936] text-white font-extrabold text-xs py-3 rounded-2xl cursor-pointer flex items-center justify-center gap-2 uppercase tracking-widest font-bold shadow-md hover:shadow-lg transition-all"
+                          >
+                            <TrendingUp className="w-4 h-4 text-emerald-400" /> Manage Treasury
+                          </button>
                         </div>
 
                       </div>
