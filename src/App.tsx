@@ -10,6 +10,7 @@ import {
   Clock, 
   ArrowRight, 
   ChevronRight, 
+  ChevronLeft,
   Trash2, 
   History, 
   PlusCircle, 
@@ -1104,8 +1105,37 @@ export default function App() {
 
                         {/* Horizontal account carousel */}
                         <div className="bg-white border border-slate-200/80 rounded-2xl p-4 text-left shadow-xs">
-                          <p className="text-[8px] font-extrabold text-slate-400 uppercase tracking-wider mb-2.5">Aggregated Account Carousel (Swipe)</p>
-                          <div className="flex gap-2.5 overflow-x-auto pb-1 mt-1 scrollbar-none snap-x snap-mandatory flex-nowrap">
+                          <div className="flex justify-between items-center mb-2.5">
+                            <p className="text-[8px] font-extrabold text-slate-400 uppercase tracking-wider">Aggregated Account Carousel (Swipe)</p>
+                            <div className="flex gap-1.5">
+                              <button
+                                onClick={() => {
+                                  const el = document.getElementById('account-carousel-container');
+                                  if (el) el.scrollBy({ left: -130, behavior: 'smooth' });
+                                  addLog(`CAROUSEL: Scrolled left.`);
+                                }}
+                                className="p-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded border border-slate-200 cursor-pointer flex items-center justify-center"
+                              >
+                                <ChevronLeft className="w-2.5 h-2.5" />
+                              </button>
+                              <button
+                                onClick={() => {
+                                  const el = document.getElementById('account-carousel-container');
+                                  if (el) el.scrollBy({ left: 130, behavior: 'smooth' });
+                                  addLog(`CAROUSEL: Scrolled right.`);
+                                }}
+                                className="p-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded border border-slate-200 cursor-pointer flex items-center justify-center"
+                              >
+                                <ChevronRight className="w-2.5 h-2.5" />
+                              </button>
+                            </div>
+                          </div>
+                          
+                          <div 
+                            id="account-carousel-container"
+                            className="flex gap-2.5 overflow-x-auto pb-1.5 mt-1 scroll-smooth snap-x snap-mandatory flex-nowrap overscroll-x-contain touch-pan-x"
+                            style={{ WebkitOverflowScrolling: 'touch' }}
+                          >
                             {bankAccounts.map(acc => (
                               <button
                                 key={acc.id}
