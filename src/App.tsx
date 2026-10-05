@@ -269,6 +269,7 @@ export default function App() {
   const [eftPayInOpen, setEftPayInOpen] = useState(false);
   // Create Payment State
   const [isCreatePaymentModalOpen, setIsCreatePaymentModalOpen] = useState(false);
+  const [isPathwayMapOpen, setIsPathwayMapOpen] = useState(false);
   const [newPayee, setNewPayee] = useState('');
   const [newPayoutAmount, setNewPayoutAmount] = useState('');
   const [newCurrency, setNewCurrency] = useState('GBP');
@@ -1119,6 +1120,78 @@ export default function App() {
                  {/* Smartphone Display boundaries */}
                 <div className={`flex-1 rounded-[32px] overflow-hidden flex flex-col relative shadow-inner transition-all duration-1000 ${currentStoryScreen === 11 && vacationMode ? 'bg-gradient-to-b from-amber-600/35 via-rose-500/25 to-[#0b1528] text-white' : 'bg-slate-50 text-slate-900'}`}>
                   
+                  {/* INTERACTIVE STORY PATHWAY STICKY RIBBON */}
+                  <div className="bg-[#0c244c]/95 backdrop-blur-md border-b border-slate-800/20 text-white px-3.5 py-1.5 flex items-center justify-between text-[10px] font-bold z-30 shrink-0 select-none">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      <span className="text-slate-300">Stitch Pathway:</span>
+                      <span className="text-emerald-400 font-extrabold">Step {currentStoryScreen} of 11</span>
+                    </div>
+                    <button
+                      onClick={() => setIsPathwayMapOpen(!isPathwayMapOpen)}
+                      className="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-white rounded text-[9px] uppercase tracking-wider font-extrabold flex items-center gap-1 cursor-pointer transition-colors animate-pulse"
+                    >
+                      <span>Jump Step</span>
+                      <span className={`text-[8px] transition-transform duration-200 inline-block ${isPathwayMapOpen ? 'rotate-180' : ''}`}>▼</span>
+                    </button>
+                  </div>
+
+                  {/* PATHWAY STEP JUMPER MAP DROPDOWN */}
+                  <AnimatePresence>
+                    {isPathwayMapOpen && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="absolute top-8 left-0 right-0 bg-[#0c142c] border-b border-slate-800 shadow-2xl z-40 p-4 max-h-[75%] overflow-y-auto scrollbar-none flex flex-col gap-2.5 text-left text-white"
+                      >
+                        <div className="flex justify-between items-center pb-2 border-b border-slate-800">
+                          <span className="text-[9px] font-black uppercase text-teal-400 tracking-wider">Select Story Milestone</span>
+                          <button onClick={() => setIsPathwayMapOpen(false)} className="text-slate-400 hover:text-white"><X className="w-3.5 h-3.5" /></button>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 gap-1.5 mt-1">
+                          {[
+                            { id: 1, label: '1. Money Thermometer', desc: 'Home Dashboard & Multi-Entity Balance', tab: 'dashboard' },
+                            { id: 2, label: '2. The Crystal Ball', desc: 'Interactive Future Cash Flow timeline', tab: 'dashboard' },
+                            { id: 3, label: '3. The X-Ray View', desc: 'Deep dive into cargo coffee invoices', tab: 'dashboard' },
+                            { id: 4, label: '4. The Smart Rescue', desc: 'Unlock instant penalty-free lifelines', tab: 'dashboard' },
+                            { id: 5, label: '5. The Chat Shortcut', desc: 'Magic £200 floating AI pay chip in chat', tab: 'payments' },
+                            { id: 6, label: '6. The Magic Camera', desc: 'OCR automated camera scanner', tab: 'payments' },
+                            { id: 7, label: '7. The AI Reader', desc: 'Summarize 10-page contract cliff notes', tab: 'payments' },
+                            { id: 8, label: '8. Boss\'s Workspace', desc: 'Triage authorizations & bulk swipe', tab: 'authorisations' },
+                            { id: 9, label: '9. VIP Hotline Chat', desc: 'Walkie-talkie compliance voice freeze', tab: 'chat' },
+                            { id: 10, label: '10. Delivery Tracker', desc: 'Payments Ledger & live cargo map tracking', tab: 'payments' },
+                            { id: 11, label: '11. Vacation Mode', desc: 'Sunset delegated approval caps', tab: 'profile' },
+                          ].map((sc) => (
+                            <button
+                              key={sc.id}
+                              onClick={() => {
+                                setCurrentStoryScreen(sc.id);
+                                setMobileTab(sc.tab as any);
+                                if (sc.id === 11) setVacationMode(true);
+                                if (sc.id === 9) startWalkieTalkieStory();
+                                if (sc.id === 5) { setWhatsappActive(false); setWhatsappUnread(true); }
+                                if (sc.id === 6) { setIsCameraCaptured(false); setIsCameraFocused(false); }
+                                if (sc.id === 7) { setIsContractSummarized(false); }
+                                if (sc.id === 10) { setIsMapTrackerOpen(true); }
+                                setIsPathwayMapOpen(false);
+                                addLog(`PATHWAY: Selected Screen ${sc.id} — ${sc.label} directly inside phone console.`);
+                              }}
+                              className={`w-full text-left p-2 rounded-xl border text-[11px] transition-all cursor-pointer flex flex-col ${currentStoryScreen === sc.id ? 'bg-[#1e293b] border-emerald-500 text-white font-extrabold ring-1 ring-emerald-500/20' : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:bg-slate-900/80 hover:text-white'}`}
+                            >
+                              <div className="flex justify-between items-center w-full">
+                                <span className="font-extrabold">{sc.label}</span>
+                                <span className="text-[8px] bg-slate-800 text-slate-400 px-1.5 py-0.2 rounded font-mono uppercase font-bold tracking-wider">{sc.tab}</span>
+                              </div>
+                              <p className="text-[9px] text-slate-400 font-semibold leading-tight mt-0.5">{sc.desc}</p>
+                            </button>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
                   {/* Sticky Notification Toast inside phone */}
                   <AnimatePresence>
                     {isAllPendingSelected && mobileTab === 'authorisations' && (
