@@ -1,0 +1,6 @@
+{
+  "name": "BulkAuth Swipe-to-Approve Console",
+  "description": "An interactive full-stack mobile mock-up with responsive swipe-to-approve gestures, real-time filters, custom item creator, and server-side Gemini transaction risk audits.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
